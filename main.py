@@ -1,7 +1,6 @@
 from voice_converter import VoiceConverter, VoiceConverterError
 from datetime import datetime
-from flask import Flask, render_template, url_for, redirect, send_file, Response, flash, get_flashed_messages, jsonify, \
-    stream_with_context
+from flask import Flask, render_template, url_for, redirect, send_file, Response, flash, get_flashed_messages, jsonify
 from flask_bootstrap import Bootstrap5
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField
@@ -10,8 +9,7 @@ import os
 
 app = Flask(__name__)
 bootstrap = Bootstrap5(app)
-# app.config['SECRET_KEY'] = os.environ.get('FLASK_KEY')
-app.config['SECRET_KEY'] = "hnrv6fijwHnd8873g45km2n2"
+app.config['SECRET_KEY'] = os.environ.get('FLASK_KEY')
 audio_generated = False
 
 
@@ -36,15 +34,16 @@ def home():
         try:
             converter = VoiceConverter(text_to_convert, voice)
             audio_generated = True
-            return Response(converter.response.content,
-                            mimetype='audio/mpeg',
-                            headers={
-                                'Cache-Control': 'no-cache, no-store, must-revalidate',
-                                'Pragma': 'no-cache',
-                                'Expires': '0'
-                            })
+            return Response(converter.response.content, headers={
+                'Content-Type': 'audio/mpeg',
+                'Content-Disposition': 'attachment; filename="music.mp3"',
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            })
         except VoiceConverterError as e:
-            flash(str(e))
+            flash(str(e), "error")
+            print("except case")
             return redirect(url_for('home'))
     return render_template("index.html", form=form)
 
@@ -57,10 +56,11 @@ def audio():
         return redirect(url_for('home'))
 
 
-def generate_audio(converter):
-    # Iterate over the audio content and yield it in chunks
-    for chunk in converter.response.iter_content(chunk_size=1024):
-        yield chunk
+@app.route('/get_flashed_messages_json')
+def get_flashed_messages_json():
+    messages = get_flashed_messages(with_categories=True)
+    print(f"message: {messages}")
+    return jsonify([{'message': message[1], 'category': message[0]} for message in messages])
 
 
 if __name__ == "__main__":
