@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+{% from "bootstrap5/form.html" import render_form %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Text to speech converter</title>
+    {% block styles %}
+    {{ bootstrap.load_css() }}
+    {% endblock %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Macondo&display=swap" rel="stylesheet">
+    <link  href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+</head>
+<body>
+<main>
+    <div class="main_part">
+        <div class="container_part">
+            <h1 class="title">Text to speech converter</h1>
+            <div class="col-lg-8 col-md-10 mx-auto">
+                {{ render_form(form, novalidate=True, button_map={"submit": "success"}) }}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+              <div class="alert alert-danger p-0 mb-0">
+
+                     {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                       {% endfor %}
+                </div>
+                  {% endif %}
+
+               {% endwith %}
+
+                <audio controls id="audioPlayer" style="display: none;">
+                    <source src="" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+        </div>
+    </div>
+</main>
+<footer>
+    <p class="footer">Nadezhda Evdokimova © {{ now.year }}</p>
+
+</footer>
+<script src="/static/script.js"></script>
+
+</body>
+</html>
